@@ -1,12 +1,12 @@
 body {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-family: 'Comic Sans MS', sans-serif;
     background-color: #ffe6f2;
     margin: 20px;
     color: #333;
 }
 
 h1, h2 {
-    color: #ff66b2;
+    color: #ff3385;
     text-align: center;
 }
 
@@ -70,6 +70,7 @@ h1, h2 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-top: 10px;
 }
 
 .product button:hover {
