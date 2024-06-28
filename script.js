@@ -41,32 +41,41 @@ document.getElementById('productForm').addEventListener('submit', async (event) 
     const price = document.getElementById('productPrice').value;
     const description = document.getElementById('productDescription').value;
     const imageFile = document.getElementById('productImage').files[0];
+    const fileType = imageFile.type.split('/')[1]; // Get the file extension (e.g., jpg, png)
     
-    const productId = generateProductId(); 
+    const productId = generateProductId();
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-        const imageData = reader.result;
-        try {
-            const response = await fetch(`${apiUrl}/product`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ productId: productId.toString(), name: name, price: Number(price), description: description, image: imageData })
-            });
-            if (!response.ok) {
-                throw new Error('Failed to add product');
-            }
-            const result = await response.json();
-            console.log('Product added:', result);
-            fetchProducts();
-            document.getElementById('productForm').reset();
-        } catch (error) {
-            console.error('Error adding product:', error);
+    try {
+        const response = await fetch(`${apiUrl}/product`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId: productId.toString(), name: name, price: Number(price), description: description, imageType: fileType })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to add product');
         }
-    };
-    reader.readAsDataURL(imageFile);
+
+        const result = await response.json();
+        const uploadURL = result.uploadURL;
+
+        // Upload image to S3 using the pre-signed URL
+        await fetch(uploadURL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': imageFile.type, // Set the Content-Type header to the image file type
+            },
+            body: imageFile
+        });
+
+        console.log('Image uploaded successfully');
+        fetchProducts();
+        document.getElementById('productForm').reset();
+    } catch (error) {
+        console.error('Error adding product:', error);
+    }
 });
 
 function updateProductPrompt(id, price, description) {

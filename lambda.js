@@ -1,9 +1,12 @@
 const AWS = require('aws-sdk');
-AWS.config.update( {
+AWS.config.update({
   region: 'us-west-1'
 });
+
 const dynamodb = new AWS.DynamoDB.DocumentClient();
+const s3 = new AWS.S3();
 const dynamodbTableName = 'product-inventory';
+const bucketName = 'hannahs-arts-crafts-images';
 const healthPath = '/health';
 const productPath = '/product';
 const productsPath = '/products';
@@ -33,7 +36,7 @@ exports.handler = async function(event) {
       break;
   }
   return response;
-}
+};
 
 async function getProduct(productId) {
   const params = {
@@ -41,7 +44,7 @@ async function getProduct(productId) {
     Key: {
       'productId': productId
     }
-  }
+  };
   return await dynamodb.get(params).promise().then((response) => {
     return buildResponse(200, response.Item);
   }, (error) => {
@@ -52,11 +55,11 @@ async function getProduct(productId) {
 async function getProducts() {
   const params = {
     TableName: dynamodbTableName
-  }
+  };
   const allProducts = await scanDynamoRecords(params, []);
   const body = {
     products: allProducts
-  }
+  };
   return buildResponse(200, body);
 }
 
@@ -65,30 +68,52 @@ async function scanDynamoRecords(scanParams, itemArray) {
     const dynamoData = await dynamodb.scan(scanParams).promise();
     itemArray = itemArray.concat(dynamoData.Items);
     if (dynamoData.LastEvaluatedKey) {
-      scanParams.ExclusiveStartkey = dynamoData.LastEvaluatedKey;
+      scanParams.ExclusiveStartKey = dynamoData.LastEvaluatedKey;
       return await scanDynamoRecords(scanParams, itemArray);
     }
     return itemArray;
-  } catch(error) {
+  } catch (error) {
     console.error('Console Log Error Handling: ', error);
   }
 }
 
 async function saveProduct(requestBody) {
+  const productId = requestBody.productId || Math.floor(Math.random() * 1000).toString();
+  const imageType = requestBody.imageType || 'jpg'; // Default to 'jpg' if not specified
+  const contentType = imageType === 'png' ? 'image/png' : 'image/jpeg';
+
+  // Generate pre-signed URL for image upload
+  const s3Params = {
+    Bucket: bucketName,
+    Key: `${productId}.${imageType}`,
+    Expires: 60 * 5, // URL expires in 5 minutes
+    ContentType: contentType
+  };
+  const uploadURL = s3.getSignedUrl('putObject', s3Params);
+
+  // Save product details in DynamoDB
   const params = {
     TableName: dynamodbTableName,
-    Item: requestBody
-  }
+    Item: {
+      productId: productId,
+      name: requestBody.name,
+      price: requestBody.price,
+      description: requestBody.description,
+      image: `https://${bucketName}.s3.amazonaws.com/${productId}.${imageType}` // Image URL
+    }
+  };
+
   return await dynamodb.put(params).promise().then(() => {
     const body = {
       Operation: 'SAVE',
       Message: 'SUCCESS',
-      Item: requestBody
-    }
+      Item: params.Item,
+      uploadURL: uploadURL // Return the pre-signed URL for the frontend to use
+    };
     return buildResponse(200, body);
   }, (error) => {
     console.error('Console Log Error Handling: ', error);
-  })
+  });
 }
 
 async function modifyProduct(productId, updateKey, updateValue) {
@@ -102,17 +127,17 @@ async function modifyProduct(productId, updateKey, updateValue) {
       ':value': updateValue
     },
     ReturnValues: 'UPDATED_NEW'
-  }
+  };
   return await dynamodb.update(params).promise().then((response) => {
     const body = {
       Operation: 'UPDATE',
       Message: 'SUCCESS',
       UpdatedAttributes: response
-    }
+    };
     return buildResponse(200, body);
   }, (error) => {
     console.error('Console Log Error Handling: ', error);
-  })
+  });
 }
 
 async function deleteProduct(productId) {
@@ -122,17 +147,17 @@ async function deleteProduct(productId) {
       'productId': productId
     },
     ReturnValues: 'ALL_OLD'
-  }
+  };
   return await dynamodb.delete(params).promise().then((response) => {
     const body = {
       Operation: 'DELETE',
       Message: 'SUCCESS',
       Item: response
-    }
+    };
     return buildResponse(200, body);
   }, (error) => {
     console.error('Console Log Error Handling: ', error);
-  })
+  });
 }
 
 function buildResponse(statusCode, body) {
@@ -141,9 +166,9 @@ function buildResponse(statusCode, body) {
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type', 
+      'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS'
     },
     body: JSON.stringify(body)
-  }
+  };
 }
