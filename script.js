@@ -27,6 +27,7 @@ function displayProducts(products) {
             <h3>${product.name}</h3>
             <p>${product.description}</p>
             <p>$${product.price}</p>
+            <img src="${product.image}" alt="${product.name}">
             <button onclick="deleteProduct('${product.productId}')">Delete Product</button>
             <button onclick="updateProductPrompt('${product.productId}', '${product.name}', '${product.price}', '${product.description}')">Update Price</button>
         `;
@@ -39,27 +40,33 @@ document.getElementById('productForm').addEventListener('submit', async (event) 
     const name = document.getElementById('productName').value;
     const price = document.getElementById('productPrice').value;
     const description = document.getElementById('productDescription').value;
+    const imageFile = document.getElementById('productImage').files[0];
     
     const productId = generateProductId(); 
 
-    try {
-        const response = await fetch(`${apiUrl}/product`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ productId: productId.toString(), name: name, price: Number(price), description: description })
-        });
-        if (!response.ok) {
-            throw new Error('Failed to add product');
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+        const imageData = reader.result;
+        try {
+            const response = await fetch(`${apiUrl}/product`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId: productId.toString(), name: name, price: Number(price), description: description, image: imageData })
+            });
+            if (!response.ok) {
+                throw new Error('Failed to add product');
+            }
+            const result = await response.json();
+            console.log('Product added:', result);
+            fetchProducts();
+            document.getElementById('productForm').reset();
+        } catch (error) {
+            console.error('Error adding product:', error);
         }
-        const result = await response.json();
-        console.log('Product added:', result);
-        fetchProducts();
-        document.getElementById('productForm').reset();
-    } catch (error) {
-        console.error('Error adding product:', error);
-    }
+    };
+    reader.readAsDataURL(imageFile);
 });
 
 function updateProductPrompt(id, price, description) {

@@ -3,31 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Etsy Shop</title>
-    <style>
-        /* Basic styling for the shop */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .form-container {
-            margin-bottom: 20px;
-        }
-        .product {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .product img {
-            max-width: 100px;
-            display: block;
-            margin-bottom: 10px;
-        }
-    </style>
+    <title>Hannah's Arts and Crafts Store</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Simple Etsy Shop</h1>
+    <h1>Hannah's Arts and Crafts Store</h1>
 
     <div class="form-container">
         <h2>Add a New Product</h2>
@@ -35,6 +15,7 @@
             <input type="text" id="productName" placeholder="Product Name" required><br>
             <input type="number" id="productPrice" placeholder="Product Price" required><br>
             <input type="text" id="productDescription" placeholder="Product Description" required><br>
+            <input type="file" id="productImage" accept="image/*" required><br>
             <button type="submit">Add Product</button>
         </form>
     </div>

@@ -1,0 +1,77 @@
+body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background-color: #ffe6f2;
+    margin: 20px;
+    color: #333;
+}
+
+h1, h2 {
+    color: #ff66b2;
+    text-align: center;
+}
+
+.form-container {
+    background-color: #fff0f5;
+    border: 2px solid #ff99cc;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-container input {
+    width: 97.5%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ff99cc;
+    border-radius: 5px;
+}
+
+.form-container button {
+    background-color: #ff66b2;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background-color: #ff3385;
+}
+
+.product {
+    background-color: #fff0f5;
+    border: 2px solid #ff99cc;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product h3 {
+    color: #ff66b2;
+}
+
+.product p {
+    margin: 5px 0;
+}
+
+.product img {
+    width: 45%;
+    display: block;
+    border-radius: 5px;
+}
+
+.product button {
+    background-color: #ff66b2;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.product button:hover {
+    background-color: #ff3385;
+}
