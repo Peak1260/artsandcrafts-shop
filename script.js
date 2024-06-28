@@ -41,7 +41,7 @@ document.getElementById('productForm').addEventListener('submit', async (event) 
     const price = document.getElementById('productPrice').value;
     const description = document.getElementById('productDescription').value;
     const imageFile = document.getElementById('productImage').files[0];
-    const fileType = imageFile.type.split('/')[1]; // Get the file extension (e.g., jpg, png)
+    const fileType = imageFile.type.split('/')[1]; 
     
     const productId = generateProductId();
 
@@ -61,11 +61,10 @@ document.getElementById('productForm').addEventListener('submit', async (event) 
         const result = await response.json();
         const uploadURL = result.uploadURL;
 
-        // Upload image to S3 using the pre-signed URL
         await fetch(uploadURL, {
             method: 'PUT',
             headers: {
-                'Content-Type': imageFile.type, // Set the Content-Type header to the image file type
+                'Content-Type': imageFile.type, 
             },
             body: imageFile
         });
@@ -78,7 +77,7 @@ document.getElementById('productForm').addEventListener('submit', async (event) 
     }
 });
 
-function updateProductPrompt(id, price, description) {
+function updateProductPrompt(id, price) {
     const newPrice = prompt("Enter new price:", price);
 
     if (newPrice) {

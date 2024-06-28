@@ -79,19 +79,17 @@ async function scanDynamoRecords(scanParams, itemArray) {
 
 async function saveProduct(requestBody) {
   const productId = requestBody.productId || Math.floor(Math.random() * 1000).toString();
-  const imageType = requestBody.imageType || 'jpg'; // Default to 'jpg' if not specified
+  const imageType = requestBody.imageType || 'jpg'; 
   const contentType = imageType === 'png' ? 'image/png' : 'image/jpeg';
 
-  // Generate pre-signed URL for image upload
   const s3Params = {
     Bucket: bucketName,
     Key: `${productId}.${imageType}`,
-    Expires: 60 * 5, // URL expires in 5 minutes
+    Expires: 60 * 5, 
     ContentType: contentType
   };
   const uploadURL = s3.getSignedUrl('putObject', s3Params);
 
-  // Save product details in DynamoDB
   const params = {
     TableName: dynamodbTableName,
     Item: {
@@ -99,7 +97,7 @@ async function saveProduct(requestBody) {
       name: requestBody.name,
       price: requestBody.price,
       description: requestBody.description,
-      image: `https://${bucketName}.s3.amazonaws.com/${productId}.${imageType}` // Image URL
+      image: `https://${bucketName}.s3.amazonaws.com/${productId}.${imageType}` 
     }
   };
 
@@ -108,7 +106,7 @@ async function saveProduct(requestBody) {
       Operation: 'SAVE',
       Message: 'SUCCESS',
       Item: params.Item,
-      uploadURL: uploadURL // Return the pre-signed URL for the frontend to use
+      uploadURL: uploadURL 
     };
     return buildResponse(200, body);
   }, (error) => {
@@ -167,7 +165,7 @@ function buildResponse(statusCode, body) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS'
+      'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS, PUT'
     },
     body: JSON.stringify(body)
   };
