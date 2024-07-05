@@ -17,9 +17,10 @@ async function fetchProducts() {
     }
 }
 
+
 function displayProducts(products) {
     const productList = document.getElementById('productList');
-    productList.innerHTML = ''; 
+    productList.innerHTML = '';
     products.forEach(product => {
         const productElement = document.createElement('div');
         productElement.className = 'product';
@@ -29,7 +30,7 @@ function displayProducts(products) {
             <p>$${product.price}</p>
             <img src="${product.image}" alt="${product.name}">
             <button onclick="deleteProduct('${product.productId}')">Delete Product</button>
-            <button onclick="updateProductPrompt('${product.productId}', '${product.name}', '${product.price}', '${product.description}')">Update Price</button>
+            <button onclick="updateProductPrompt('${product.productId}', '${product.price}')">Update Price</button>
         `;
         productList.appendChild(productElement);
     });
@@ -41,8 +42,8 @@ document.getElementById('productForm').addEventListener('submit', async (event) 
     const price = document.getElementById('productPrice').value;
     const description = document.getElementById('productDescription').value;
     const imageFile = document.getElementById('productImage').files[0];
-    const fileType = imageFile.type.split('/')[1]; 
-    
+    const fileType = imageFile.type.split('/')[1];
+
     const productId = generateProductId();
 
     try {
@@ -64,7 +65,7 @@ document.getElementById('productForm').addEventListener('submit', async (event) 
         await fetch(uploadURL, {
             method: 'PUT',
             headers: {
-                'Content-Type': imageFile.type, 
+                'Content-Type': imageFile.type,
             },
             body: imageFile
         });
@@ -92,7 +93,7 @@ async function updateProduct(productId, price) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ productId, updateKey: 'price', updateValue: price }) 
+            body: JSON.stringify({ productId, updateKey: 'price', updateValue: price })
         });
         if (!response.ok) {
             throw new Error('Failed to update product');
