@@ -1,4 +1,4 @@
-# Crochet Shop
+# Arts and Crafts Shop
 
 A serverless e-commerce platform for arts and crafts products built with AWS services, featuring full CRUD operations and a responsive web interface.
 
